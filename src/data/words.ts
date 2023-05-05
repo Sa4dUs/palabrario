@@ -1,6 +1,9 @@
-import fs from "fs"
-import path from "path"
+import { initialize } from '@paunovic/random-words'
 
-export const WORDS = fs.readFileSync(path.resolve(__dirname, process.env.NEXT_PUBLIC_DICT_PATH || "")).toString().split('\n');
+const getRandomWord = () => {
+    const RANDOM = initialize({ countryCode: 'es' })
 
-export const SECRET_WORD = WORDS[Math.floor(Math.random()*WORDS.length)];
+    return RANDOM.word();
+};
+
+export const SECRET_WORD = getRandomWord();
