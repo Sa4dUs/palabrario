@@ -3,7 +3,6 @@ import natural from "natural";
 import { SECRET_WORD } from "@/data/words";
 
 function calculateScore(guess: string): number {
-    console.log(SECRET_WORD)
     if (guess.split(" ").length > 1) {
         return -1;
     }

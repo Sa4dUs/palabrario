@@ -1,1 +1,2 @@
-declare module "@paunovic/random-words"
+declare module "random-spanish-words"
+declare module "node-schedule"

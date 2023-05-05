@@ -1,9 +1,14 @@
-import { initialize } from '@paunovic/random-words'
+import randomWords from 'random-spanish-words';
+import schedule from 'node-schedule';
 
-const getRandomWord = () => {
-    const RANDOM = initialize({ countryCode: 'es' })
+let SECRET_WORD = 'hola';
 
-    return RANDOM.word();
-};
+const updateSecretWord = () => {
+  SECRET_WORD = randomWords();
+  console.log(`New secret word set: ${SECRET_WORD}`);
+}
 
-export const SECRET_WORD = getRandomWord();
+// Schedule the update to happen every day at 00:00
+schedule.scheduleJob('0 0 * * *', updateSecretWord);
+
+export { SECRET_WORD };
