@@ -10,7 +10,7 @@ const getSecretWord = () => {
         .then((data) => {
             console.log(data)
             SECRET_WORD = data.result;
-        });
+        })
 };
 
 getSecretWord();
