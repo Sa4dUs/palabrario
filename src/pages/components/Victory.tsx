@@ -1,5 +1,6 @@
 import { useRouter } from "next/router";
 import ShareButton from "./ShareButton";
+import { useState } from "react";
 
 interface PropType {
     word: string;
@@ -9,6 +10,8 @@ interface PropType {
 
 function Victory({ word, counter, typeOfGuesses = [0, 0, 0] }: PropType) {
     const router = useRouter();
+    let date = new Date();
+    let dateString = date.toLocaleDateString();
 
     return (
         <div className="flex flex-col items-center justify-center h-full">
@@ -17,8 +20,7 @@ function Victory({ word, counter, typeOfGuesses = [0, 0, 0] }: PropType) {
                     ¡HAS GANADO!
                 </h1>
                 <p>
-                    ¡Has adivinado la palabra
-                    <b> {word} </b>
+                    ¡Has adivinado la palabra de hoy <b>({dateString}) </b>
                     en <b> {counter} </b>
                     intentos!
                 </p>
