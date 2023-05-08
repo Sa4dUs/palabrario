@@ -6,10 +6,12 @@ interface WordType {
 }
 
 interface PropType {
-    wordlist: WordType[]
+    wordlist: WordType[];
 }
 
-function WordList({wordlist}: PropType) {
+
+
+function WordList({ wordlist = [] }: PropType) {
     return (
         <ul className="flex flex-col items-center w-80">
             {wordlist.length !== 0 &&
@@ -24,4 +26,4 @@ function WordList({wordlist}: PropType) {
     );
 }
 
-export default WordList
+export default WordList;

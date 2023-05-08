@@ -15,7 +15,7 @@ const getColor = (percentage: number): string => {
     return color;
 };
 
-const Word = ({ percentage, text }: PropType) => {
+const Word = ({ percentage=0, text }: PropType) => {
     return (
         <li className="w-full mb-4">
             <div
