@@ -1,35 +1,23 @@
 import { useState } from "react";
-import { useRouter } from "next/router";
-import ShareButton from "./components/ShareButton";
+
+import Victory from "./components/Victory";
+import Word from "./components/Word";
+import WordList from "./components/WordList";
+import Spinner from "./components/Spinner";
 
 interface Word {
     text: string;
     score: number;
 }
 
-const getColor = (percentage: number): string => {
-    let color;
-    if (percentage < 50) {
-        color = "bg-red-400";
-    } else if (percentage < 75) {
-        color = "bg-yellow-400";
-    } else {
-        color = "bg-green-400";
-    }
-    return color;
-};
-
 const SecretWordGame: React.FC = () => {
-    const router = useRouter();
-
     const [wordlist, setWordlist] = useState<Word[]>([]);
     const [guess, setGuess] = useState<string>("");
-    const [lastScore, setLastScore] = useState<number>();
+    const [lastScore, setLastScore] = useState<number>(0);
     const [counter, setCounter] = useState<number>(0);
     const [typeOfGuesses, setTypeOfGuesses] = useState<number[]>([0, 0, 0]);
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const [lastWord, setLastWord] = useState<string>("");
-    const [lastPercentage, setLastPercentage] = useState<number>(0);
 
     const handleSubmit = async (
         event: React.KeyboardEvent<HTMLInputElement>
@@ -61,7 +49,6 @@ const SecretWordGame: React.FC = () => {
             );
             let newTypeOfGuesses;
             let percentage = score * 100;
-            setLastPercentage(percentage);
             if (percentage < 50) {
                 newTypeOfGuesses = [
                     typeOfGuesses[0] + 1,
@@ -98,36 +85,7 @@ const SecretWordGame: React.FC = () => {
             flex flex-col items-center justify-start bg-gray-900 text-white font-sans"
         >
             {lastScore === 1 && (
-                <div className="flex flex-col items-center justify-center h-full">
-                    <div className="flex flex-col items-center justify-center p-4 rounded-md bg-slate-800">
-                        <h1 className="text-5xl font-bold text-green-500 my-4">
-                            ¡HAS GANADO!
-                        </h1>
-                        <p>
-                            ¡Has adivinado la palabra
-                            <b> {wordlist[0].text.toUpperCase()} </b>
-                            en <b> {counter} </b>
-                            intentos!
-                        </p>
-                        <p>🟩{typeOfGuesses[2]}</p>
-                        <p>🟨{typeOfGuesses[1]}</p>
-                        <p>🟥{typeOfGuesses[0]}</p>
-                        <ShareButton
-                            text={`!He adivinado la palabra jugando a ${process.env.NEXT_PUBLIC_BASE_URL}!
-                    🟩${typeOfGuesses[2]}
-                    🟨${typeOfGuesses[1]}
-                    🟥${typeOfGuesses[0]}`}
-                        />
-                    </div>
-                    <button
-                        className="mt-8 bg-green-500 hover:bg-green-600 text-white py-2 px-4 w-60 font-semibold rounded-md"
-                        onClick={() => {
-                            router.reload();
-                        }}
-                    >
-                        Volver a jugar
-                    </button>
-                </div>
+                <Victory word={wordlist[0].text.toUpperCase()} counter={counter} typeOfGuesses={typeOfGuesses}/>
             )}
             {lastScore !== 1 && (
                 <div className="flex flex-col items-center justify-start">
@@ -150,7 +108,9 @@ const SecretWordGame: React.FC = () => {
                             type="text"
                             value={guess}
                             placeholder="escribe una palabra"
-                            onChange={(event) => setGuess(event.target.value)}
+                            onChange={(event) =>
+                                setGuess(event.target.value.toLowerCase())
+                            }
                             onKeyDown={(event) => {
                                 if (event.key === "Enter") {
                                     handleSubmit(event);
@@ -166,83 +126,17 @@ const SecretWordGame: React.FC = () => {
                     )}
                     {(wordlist.length !== 0 || isLoading) &&
                         (!isLoading ? (
-                            <ul className="flex flex-col items-center w-80">
-                                <li className="w-full mb-4">
-                                    <div
-                                        className="h-8 relative rounded-md border-4 overflow-hidden py-5"
-                                        style={{ maxWidth: "400px" }}
-                                    >
-                                        <div
-                                            className={`absolute top-0 left-0 h-full w-full ${getColor(
-                                                lastPercentage
-                                            )}`}
-                                            style={{
-                                                width: `${lastPercentage}%`,
-                                            }}
-                                        />
-                                        <div className="absolute top-0 left-0 flex items-center justify-between w-full h-full pr-4 pl-4">
-                                            <p className="text-md font-semibold">
-                                                {lastWord.toLowerCase()}
-                                            </p>
-                                            <p className="ml-2 text-sm font-medium">
-                                                {lastPercentage.toFixed(2)}%
-                                            </p>
-                                        </div>
-                                    </div>
-                                </li>
+                            <>
+                                <WordList wordlist={[{text:lastWord,score:lastScore}]}/>
                                 <hr className="mb-4 w-full h-0.5 border-t-0 bg-neutral-100 opacity-100 dark:opacity-50" />{" "}
-                            </ul>
+                            </>
                         ) : (
                             <>
-                                <div
-                                    className=" mb-4 inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-current border-r-transparent align-[-0.125em] motion-reduce:animate-[spin_1.5s_linear_infinite]"
-                                    role="status"
-                                >
-                                    <span className="!absolute !-m-px !h-px !w-px !overflow-hidden !whitespace-nowrap !border-0 !p-0 ![clip:rect(0,0,0,0)]">
-                                        Loading...
-                                    </span>
-                                </div>
+                                <Spinner/>
                                 <hr className="mb-4 w-full h-0.5 border-t-0 bg-neutral-100 opacity-100 dark:opacity-50" />{" "}
                             </>
                         ))}
-                    <ul className="flex flex-col items-center w-80">
-                        {wordlist.length !== 0 &&
-                            wordlist.map(({ text, score }, index) => {
-                                const percentage = score * 100;
-                                let color;
-                                if (percentage < 50) {
-                                    color = "bg-red-400";
-                                } else if (percentage < 75) {
-                                    color = "bg-yellow-400";
-                                } else {
-                                    color = "bg-green-400";
-                                }
-
-                                return (
-                                    <li key={index} className="w-full mb-4">
-                                        <div
-                                            className="h-8 relative rounded-md border-4 overflow-hidden py-5"
-                                            style={{ maxWidth: "400px" }}
-                                        >
-                                            <div
-                                                className={`absolute top-0 left-0 h-full w-full ${color}`}
-                                                style={{
-                                                    width: `${percentage}%`,
-                                                }}
-                                            />
-                                            <div className="absolute top-0 left-0 flex items-center justify-between w-full h-full pr-4 pl-4">
-                                                <p className="text-md font-semibold">
-                                                    {text.toLowerCase()}
-                                                </p>
-                                                <p className="ml-2 text-sm font-medium">
-                                                    {percentage.toFixed(2)}%
-                                                </p>
-                                            </div>
-                                        </div>
-                                    </li>
-                                );
-                            })}
-                    </ul>
+                    <WordList wordlist={wordlist}/>
                 </div>
             )}
         </div>
