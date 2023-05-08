@@ -1,14 +1,18 @@
-import randomWords from 'random-spanish-words';
-import schedule from 'node-schedule';
+let SECRET_WORD = "";
 
-let SECRET_WORD = 'hola';
+const getSecretWord = () => {
+    fetch(`${process.env.NEXT_PUBLIC_REDIS_URL}/get/wotd`, {
+        headers: {
+            Authorization: `Bearer ${process.env.NEXT_PUBLIC_REDIS_TOKEN}`,
+        },
+    })
+        .then((response) => response.json())
+        .then((data) => {
+            console.log(data)
+            SECRET_WORD = data.result;
+        });
+};
 
-const updateSecretWord = () => {
-  SECRET_WORD = randomWords();
-  console.log(`New secret word set: ${SECRET_WORD}`);
-}
-
-// Schedule the update to happen every day at 00:00
-schedule.scheduleJob('0 0 * * *', updateSecretWord);
+getSecretWord();
 
 export { SECRET_WORD };
