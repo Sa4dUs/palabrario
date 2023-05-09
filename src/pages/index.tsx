@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import Victory from "./components/Victory";
 import Word from "./components/Word";
@@ -18,6 +18,21 @@ const SecretWordGame: React.FC = () => {
     const [typeOfGuesses, setTypeOfGuesses] = useState<number[]>([0, 0, 0]);
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const [lastWord, setLastWord] = useState<string>("");
+    const [secret, setSecret] = useState<string>("");
+
+    useEffect(() => {
+        (async () => {
+            await fetch(`${process.env.NEXT_PUBLIC_REDIS_URL}/get/wotd`, {
+                headers: {
+                    Authorization: `Bearer ${process.env.NEXT_PUBLIC_REDIS_TOKEN}`,
+                },
+            })
+                .then((response) => response.json())
+                .then((data) => {
+                    setSecret(data.result);
+                })
+        })()
+    },[])
 
     const handleSubmit = async (
         event: React.KeyboardEvent<HTMLInputElement>
@@ -27,7 +42,7 @@ const SecretWordGame: React.FC = () => {
         event.preventDefault();
         const response = await fetch("/api/guess", {
             method: "POST",
-            body: JSON.stringify({ guess }),
+            body: JSON.stringify({ guess, secret }),
             headers: {
                 "Content-Type": "application/json",
             },

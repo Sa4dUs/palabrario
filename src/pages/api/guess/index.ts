@@ -3,6 +3,7 @@ import calculateScore from '@/lib/calculateScore';
 
 interface GuessRequestBody {
   guess: string;
+  secret: string;
 }
 
 interface GuessResponseBody {
@@ -15,14 +16,14 @@ export default function handler(req: NextApiRequest, res: NextApiResponse<GuessR
     return;
   }
 
-  const { guess } = req.body as GuessRequestBody;
+  const { guess, secret } = req.body as GuessRequestBody;
 
-  if (!guess || guess.trim().length === 0) {
+  if (!guess || guess.trim().length === 0 || !secret || secret.trim().length === 0) {
     res.status(400).send('Bad Request: "guess" is required');
     return;
   }
 
-  let score = calculateScore(guess);
+  let score = calculateScore(guess, secret);
 
   const responseBody: GuessResponseBody = { score };
 
