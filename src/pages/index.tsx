@@ -21,6 +21,7 @@ const SecretWordGame: React.FC = () => {
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const [lastWord, setLastWord] = useState<string>("");
     const [secret, setSecret] = useState<string>("");
+    const [id, setId] = useState<number>(0);
 
     useEffect(() => {
         (async () => {
@@ -32,9 +33,18 @@ const SecretWordGame: React.FC = () => {
                 .then((response) => response.json())
                 .then((data) => {
                     setSecret(data.result);
-                })
-        })()
-    },[])
+                });
+            await fetch(`${process.env.NEXT_PUBLIC_REDIS_URL}/get/id`, {
+                headers: {
+                    Authorization: `Bearer ${process.env.NEXT_PUBLIC_REDIS_TOKEN}`,
+                },
+            })
+                .then((response) => response.json())
+                .then((data) => {
+                    setId(parseInt(data.result));
+                });
+        })();
+    }, []);
 
     const handleSubmit = async (
         event: React.KeyboardEvent<HTMLInputElement>
@@ -98,70 +108,84 @@ const SecretWordGame: React.FC = () => {
 
     return (
         <>
-        <Head>
-            <title>Palabrario</title>
-        </Head>
-        <div
-            className="h-screen
+            <Head>
+                <title>Palabrario</title>
+            </Head>
+            <div
+                className="h-screen
             flex flex-col items-center justify-start bg-gray-900 text-white font-sans"
-        >
-            {lastScore === 1 && (
-                <Victory word={wordlist[0].text.toUpperCase()} counter={counter} typeOfGuesses={typeOfGuesses}/>
-            )}
-            {lastScore !== 1 && (
-                <div className="flex flex-col flex-grow items-center justify-start">
-                    <h1 className="text-5xl font-bold mt-8 mb-16 text-white">
-                        PALABRARIO
-                    </h1>
-                    <form
-                        onSubmit={(event) => event.preventDefault()}
-                        className="flex flex-col items-center"
-                    >
-                        <label
-                            htmlFor="guess"
-                            className="mb-4 text-sm font-semibold self-start"
+            >
+                {lastScore === 1 && (
+                    <Victory
+                        id={id}
+                        counter={counter}
+                        typeOfGuesses={typeOfGuesses}
+                    />
+                )}
+                {lastScore !== 1 && (
+                    <div className="flex flex-col flex-grow items-center justify-start">
+                        <h1 className="text-5xl font-bold mt-8 mb-16 text-white">
+                            PALABRARIO
+                        </h1>
+                        <form
+                            onSubmit={(event) => event.preventDefault()}
+                            className="flex flex-col items-center"
                         >
-                            INTENTOS:{" "}
-                            <span className="text-xl font-bold">{counter}</span>
-                        </label>
-                        <input
-                            id="guess"
-                            type="text"
-                            value={guess}
-                            placeholder="escribe una palabra"
-                            onChange={(event) =>
-                                setGuess(event.target.value.toLowerCase())
-                            }
-                            onKeyDown={(event) => {
-                                if (event.key === "Enter") {
-                                    handleSubmit(event);
+                            <label
+                                htmlFor="guess"
+                                className="mb-4 text-sm font-semibold self-start"
+                            >
+                                INTENTOS:{" "}
+                                <span className="text-xl font-bold">
+                                    {counter}
+                                </span>
+                            </label>
+                            <input
+                                id="guess"
+                                type="text"
+                                value={guess}
+                                placeholder="escribe una palabra"
+                                onChange={(event) =>
+                                    setGuess(event.target.value.toLowerCase())
                                 }
-                            }}
-                            className="p-4 border border-gray-300 rounded-md mb-4 text-white bg-slate-800 w-80"
-                        />
-                    </form>
-                    {lastScore === -1 && (
-                        <p className="text-white text-base font-semibold mt-4 mb-8">
-                            Esta palabra no es válida
-                        </p>
-                    )}
-                    {(lastScore !== -1 && wordlist.length !== 0 || isLoading) &&
-                        (!isLoading ? (
-                            <>
-                                <WordList wordlist={[{text:lastWord,score:lastScore}]}/>
-                                <hr className="mb-4 w-full h-0.5 border-t-0 bg-neutral-100 opacity-100 dark:opacity-50" />{" "}
-                            </>
-                        ) : (
-                            <>
-                                <Spinner/>
-                                <hr className="mb-4 w-full h-0.5 border-t-0 bg-neutral-100 opacity-100 dark:opacity-50" />{" "}
-                            </>
-                        ))}
-                    <WordList wordlist={wordlist}/>
-                </div>
-            )}
-            <Footer/>
-        </div>
+                                onKeyDown={(event) => {
+                                    if (event.key === "Enter") {
+                                        handleSubmit(event);
+                                    }
+                                }}
+                                className="p-4 border border-gray-300 rounded-md mb-4 text-white bg-slate-800 w-80"
+                            />
+                        </form>
+                        {lastScore === -1 && (
+                            <p className="text-white text-base font-semibold mt-4 mb-8">
+                                Esta palabra no es válida
+                            </p>
+                        )}
+                        {((lastScore !== -1 && wordlist.length !== 0) ||
+                            isLoading) &&
+                            (!isLoading ? (
+                                <>
+                                    <WordList
+                                        wordlist={[
+                                            {
+                                                text: lastWord,
+                                                score: lastScore,
+                                            },
+                                        ]}
+                                    />
+                                    <hr className="mb-4 w-full h-0.5 border-t-0 bg-neutral-100 opacity-100 dark:opacity-50" />{" "}
+                                </>
+                            ) : (
+                                <>
+                                    <Spinner />
+                                    <hr className="mb-4 w-full h-0.5 border-t-0 bg-neutral-100 opacity-100 dark:opacity-50" />{" "}
+                                </>
+                            ))}
+                        <WordList wordlist={wordlist} />
+                    </div>
+                )}
+                <Footer />
+            </div>
         </>
     );
 };
