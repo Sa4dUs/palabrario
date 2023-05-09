@@ -9,8 +9,6 @@ interface PropType {
 
 function Victory({ id, counter, typeOfGuesses = [0, 0, 0] }: PropType) {
     const router = useRouter();
-    let date = new Date();
-    let dateString = date.toLocaleDateString();
 
     return (
         <div className="flex flex-col items-center justify-center h-full">
@@ -19,7 +17,8 @@ function Victory({ id, counter, typeOfGuesses = [0, 0, 0] }: PropType) {
                     Felicidades!
                 </h1>
                 <p className="font-semibold">
-                    Has adivinado la palabra <span className="font-bold">#{id} </span>
+                    Has adivinado la palabra{" "}
+                    <span className="font-bold">{`#${id}`} </span>
                     en <span className="font-bold"> {counter} </span>
                     intentos
                 </p>
@@ -27,7 +26,11 @@ function Victory({ id, counter, typeOfGuesses = [0, 0, 0] }: PropType) {
                 <p>🟨{typeOfGuesses[1]}</p>
                 <p>🟥{typeOfGuesses[0]}</p>
                 <ShareButton
-                    text={`¡He adivinado la palabra jugando a ${process.env.NEXT_PUBLIC_BASE_URL}!\n🟩${typeOfGuesses[2]}\n🟨${typeOfGuesses[1]}\n🟥${typeOfGuesses[0]}`}
+                    text={
+                        counter === 1
+                            ? `¡He adivinado la palabra #${id} a la primera en ${process.env.NEXT_PUBLIC_BASE_URL}!\n🟩${typeOfGuesses[2]}\n🟨${typeOfGuesses[1]}\n🟥${typeOfGuesses[0]}`
+                            : `¡He adivinado la palabra #${id} jugando a ${process.env.NEXT_PUBLIC_BASE_URL}!\n🟩${typeOfGuesses[2]}\n🟨${typeOfGuesses[1]}\n🟥${typeOfGuesses[0]}`
+                    }
                 />
             </div>
             <button

@@ -135,8 +135,13 @@ const SecretWordGame: React.FC = () => {
                                 htmlFor="guess"
                                 className="mb-4 text-sm font-semibold self-start"
                             >
+                                JUEGO:{" "}
+                                <span className="text-xl font-semibold">
+                                    #{id}
+                                </span>
+                                {" "}
                                 INTENTOS:{" "}
-                                <span className="text-xl font-bold">
+                                <span className="text-xl font-semibold">
                                     {counter}
                                 </span>
                             </label>
