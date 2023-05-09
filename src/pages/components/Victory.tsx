@@ -20,7 +20,7 @@ function Victory({ id, counter, typeOfGuesses = [0, 0, 0] }: PropType) {
                     Has adivinado la palabra{" "}
                     <span className="font-bold">{`#${id}`} </span>
                     en <span className="font-bold"> {counter} </span>
-                    intentos
+                    {counter === 1 ? "intento" : "intentos"}
                 </p>
                 <p>🟩{typeOfGuesses[2]}</p>
                 <p>🟨{typeOfGuesses[1]}</p>
