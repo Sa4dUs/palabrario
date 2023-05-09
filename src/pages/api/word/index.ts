@@ -6,6 +6,8 @@ export default function handler(
     req: NextApiRequest,
     res: NextApiResponse
 ) {
+    if (req.method === 'GET' || req.method === 'POST') {
+    console.log(req.method);
     try {
         fetch(
             `${process.env.NEXT_PUBLIC_REDIS_URL}/set/wotd/${randomWords()}`,
@@ -22,4 +24,5 @@ export default function handler(
     } finally {
         res.end();
     }
+}
 }

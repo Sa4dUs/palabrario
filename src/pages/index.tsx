@@ -1,9 +1,11 @@
 import { useEffect, useState } from "react";
 
+import Head from "next/head";
 import Victory from "./components/Victory";
 import Word from "./components/Word";
 import WordList from "./components/WordList";
 import Spinner from "./components/Spinner";
+import Footer from "./components/Footer";
 
 interface Word {
     text: string;
@@ -95,6 +97,10 @@ const SecretWordGame: React.FC = () => {
     };
 
     return (
+        <>
+        <Head>
+            <title>Palabrario</title>
+        </Head>
         <div
             className="h-screen
             flex flex-col items-center justify-start bg-gray-900 text-white font-sans"
@@ -103,7 +109,7 @@ const SecretWordGame: React.FC = () => {
                 <Victory word={wordlist[0].text.toUpperCase()} counter={counter} typeOfGuesses={typeOfGuesses}/>
             )}
             {lastScore !== 1 && (
-                <div className="flex flex-col items-center justify-start">
+                <div className="flex flex-col flex-grow items-center justify-start">
                     <h1 className="text-5xl font-bold mt-8 mb-16 text-white">
                         PALABRARIO
                     </h1>
@@ -139,7 +145,7 @@ const SecretWordGame: React.FC = () => {
                             Esta palabra no es válida
                         </p>
                     )}
-                    {(wordlist.length !== 0 || isLoading) &&
+                    {(lastScore !== -1 && wordlist.length !== 0 || isLoading) &&
                         (!isLoading ? (
                             <>
                                 <WordList wordlist={[{text:lastWord,score:lastScore}]}/>
@@ -154,7 +160,9 @@ const SecretWordGame: React.FC = () => {
                     <WordList wordlist={wordlist}/>
                 </div>
             )}
+            <Footer/>
         </div>
+        </>
     );
 };
 
